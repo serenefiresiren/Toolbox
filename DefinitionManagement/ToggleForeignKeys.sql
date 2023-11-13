@@ -2,7 +2,7 @@ DECLARE @FilterTable nvarchar(255) = '[schema].[table]'
 
 SELECT CONCAT ('ALTER TABLE ', SourceTable, ' DROP CONSTRAINT ', ConstraintName) [DropConstraint]
 	, CONCAT ('ALTER TABLE ', SourceTable, ' NOCHECK CONSTRAINT ', ConstraintName) [NoCheck]
-	, CONCAT ('ALTER TABLE ', SourceTable, ' WITH CHECK ADD CONSTRAINT ', ConstraintName, ' FOREIGN KEY (', SourceColumn, ' REFERENCES ', TargetTable, ' (', TargetColumn, ')') 
+	, CONCAT ('ALTER TABLE ', SourceTable, ' WITH CHECK ADD CONSTRAINT ', ConstraintName, ' FOREIGN KEY (', SourceColumn, ') REFERENCES ', TargetTable, ' (', TargetColumn, ')') 
 		+ CASE 
 			WHEN DeleteAction <> 'NO_ACTION'
 				THEN ' ON DELETE ' + DeleteAction

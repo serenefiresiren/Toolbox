@@ -23,8 +23,7 @@ SELECT s.name AS schema_name
 			ORDER BY ic.key_ordinal
 			FOR XML PATH('')
 			), 1, 2, '') AS key_column_list
-	,
-	-- Included columns without ordering
+	, 
 	STUFF((
 			SELECT ', ' + c.name
 			FROM sys.index_columns ic
@@ -55,4 +54,3 @@ ORDER BY schema_name
 		END DESC
 	,i.is_primary_key
 	,index_name;
-

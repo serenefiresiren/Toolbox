@@ -1,5 +1,4 @@
-DECLARE @TargetTable nvarchar(100) -- = '%'
-,@SourceTable nvarchar(100) --= 'Law.StatutorySentenceProfile'
+DECLARE @TargetTable nvarchar(100), @SourceTable nvarchar(100) 
 
 SELECT  'ALTER TABLE '
 		+SourceTable

@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 DECLARE @ParentTable nvarchar(255) , @ChildTable nvarchar(255) 
+=======
+>>>>>>> 576c9bc8519e28203cccdaab24afa7c6a0829606
 SELECT CONCAT (
 		'ALTER TABLE '
 		,SourceTable
@@ -59,8 +62,19 @@ FROM (
 			,']'
 			) TargetTable
 		,QUOTENAME(fk.name) [ConstraintName]
+<<<<<<< HEAD
 		,STRING_AGG(QUOTENAME(sc.name), ',') Within Group(Order By Constraint_column_id)  [SourceColumns]
 		,STRING_AGG(QUOTENAME(tc.Name), ',') Within Group(Order By Constraint_column_id) [TargetColumns]
+=======
+		,STRING_AGG(QUOTENAME(sc.name), ',') WITHIN
+	GROUP (
+			ORDER BY fkc.Constraint_Column_ID
+			) [SourceColumns]
+		,STRING_AGG(QUOTENAME(tc.Name), ',') WITHIN
+	GROUP (
+			ORDER BY fkc.Constraint_Column_ID
+			) [TargetColumns]
+>>>>>>> 576c9bc8519e28203cccdaab24afa7c6a0829606
 		,delete_referential_action_desc COLLATE SQL_Latin1_General_CP1_CI_AS [DeleteAction]
 		,update_referential_action_desc COLLATE SQL_Latin1_General_CP1_CI_AS [UpdateAction] 
 	FROM sys.foreign_keys fk
@@ -69,6 +83,7 @@ FROM (
 		AND fkc.parent_object_id = sc.object_id
 	INNER JOIN sys.columns tc ON fkc.referenced_column_id = tc.column_id
 		AND fkc.referenced_object_id = tc.object_id
+<<<<<<< HEAD
 		CROSS APPLY (Select CONCAT(OBJECT_SCHEMA_NAME(fk.parent_object_id)
 		 ,'.'
 		 
@@ -79,6 +94,8 @@ FROM (
 			,OBJECT_NAME(fk.referenced_object_id)) TargetTable) td 
 			WHERE (@ParentTable IS NULL OR OBJECT_NAME(fk.Parent_Object_id) = @ParentTable)
 			AND (@ChildTable IS NULL OR OBJECT_NAME(fk.referenced_object_id) = @ChildTable)
+=======
+>>>>>>> 576c9bc8519e28203cccdaab24afa7c6a0829606
 	GROUP BY fk.parent_object_id
 		,fk.referenced_object_id
 		,fk.name

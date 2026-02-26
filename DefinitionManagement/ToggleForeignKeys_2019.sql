@@ -14,31 +14,31 @@ SELECT 'ALTER TABLE ' + ParentObject + ' DROP CONSTRAINT ' + fkName [DropConstra
 FROM sys.foreign_keys fk
 CROSS APPLY (
 	SELECT QUOTENAME(OBJECT_SCHEMA_NAME(fk.parent_object_id)) + '.' + QUOTENAME(OBJECT_NAME(fk.parent_object_id)) [ParentObject]
-		,QUOTENAME(OBJECT_SCHEMA_NAME(fk.referenced_object_id)) + '.' + QUOTENAME(OBJECT_NAME(fk.referenced_object_id)) [ReferencedObject]
+		,QUOTENAME(OBJECT_SCHEMA_NAME(fk.referenced_object_id)) + '.' + QUOTENAME(OBJECT_NAME(fk.referenced_object_id)) 	[ReferencedObject]
 		,QUOTENAME(fk.name) [fkName]
-		,STUFF((
-				SELECT ', ' + QUOTENAME(c.name)
-				FROM sys.foreign_key_columns fkc
-				INNER JOIN sys.columns c ON fkc.parent_object_id = c.object_id
-					AND fkc.parent_column_id = c.column_id
-				WHERE fkc.constraint_object_id = fk.object_id
-				ORDER BY fkc.constraint_column_id
-				FOR XML PATH('')
-					,TYPE
-				).value('.', 'NVARCHAR(MAX)'), 1, 2, '') [ParentObjectCols]
-		,STUFF((
-				SELECT ', ' + QUOTENAME(c.name)
-				FROM sys.foreign_key_columns fkc
-				INNER JOIN sys.columns c ON fkc.referenced_object_id = c.object_id
-					AND fkc.referenced_column_id = c.column_id
-				WHERE fkc.constraint_object_id = fk.object_id
-				ORDER BY fkc.constraint_column_id
-				FOR XML PATH('')
-					,TYPE
-				).value('.', 'NVARCHAR(MAX)'), 1, 2, '') [ReferencedObjectCols]
+		,(
+			SELECT STRING_AGG(QUOTENAME(c.name), ', ') WITHIN
+			GROUP (
+					ORDER BY fkc.constraint_column_id
+					)
+			FROM sys.foreign_key_columns fkc
+			INNER JOIN sys.columns c ON fkc.parent_object_id = c.object_id
+				AND fkc.parent_column_id = c.column_id
+			WHERE fkc.constraint_object_id = fk.object_id
+			) [ParentObjectCols]
+		,(
+			SELECT STRING_AGG(QUOTENAME(c.name), ', ') WITHIN
+			GROUP (
+					ORDER BY fkc.constraint_column_id
+					)
+			FROM sys.foreign_key_columns fkc
+			INNER JOIN sys.columns c ON fkc.referenced_object_id = c.object_id
+				AND fkc.referenced_column_id = c.column_id
+			WHERE fkc.constraint_object_id = fk.object_id
+			) [ReferencedObjectCols]
 		,fk.delete_referential_action_desc COLLATE SQL_Latin1_General_CP1_CI_AS [DeleteAction]
 		,fk.update_referential_action_desc COLLATE SQL_Latin1_General_CP1_CI_AS [UpdateAction]
-	) d
+	) d 
 WHERE @ReferencedTable = ''
 	OR OBJECT_NAME(fk.referenced_object_id) = @ReferencedTable
 	OR OBJECT_NAME(fk.parent_object_id) = @ReferencedTable
